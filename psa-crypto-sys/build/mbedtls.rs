@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 /* Copyright (c) Fortanix, Inc.
  *
  * Licensed under the GNU General Public License, version 2 <LICENSE-GPL or

@@ -50,9 +50,9 @@ cargo build --no-default-features --features minerva-nostd
 # psa-crypto
 popd
 pushd psa-crypto
-cargo build --no-default-features
-cargo build --no-default-features --features operations
-cargo build --no-default-features --features no-std
+cargo build --no-default-features --features minerva
+cargo build --no-default-features --features "minerva operations"
+cargo build --no-default-features --features "minerva no-std"
 
 # Test dynamic linking
 git clone https://github.com/ARMmbed/mbedtls.git
