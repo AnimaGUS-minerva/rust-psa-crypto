@@ -45,7 +45,7 @@ rm -rf psa-crypto/mbedtls
 ################################
 # psa-crypto-sys
 pushd psa-crypto-sys
-cargo build --no-default-features
+cargo build --no-default-features --features minerva-nostd
 
 # psa-crypto
 popd
