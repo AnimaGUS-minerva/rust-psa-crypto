@@ -109,13 +109,13 @@ impl Features {
 fn env_have_target_cfg(var: &'static str, value: &'static str) -> bool {
     let env = format!("CARGO_CFG_TARGET_{}", var)
         .to_uppercase()
-        .replace("-", "_");
+        .replace('-', "_");
     env::var_os(env).map_or(false, |s| s == value)
 }
 
 fn env_have_feature(feature: &'static str) -> bool {
     let env = format!("CARGO_FEATURE_{}", feature)
         .to_uppercase()
-        .replace("-", "_");
+        .replace('-', "_");
     env::var_os(env).is_some()
 }

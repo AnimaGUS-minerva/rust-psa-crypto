@@ -8,8 +8,6 @@
  * option. This file may not be copied, modified, or distributed except
  * according to those terms. */
 
-use bindgen;
-
 use std::fmt::Write as _;
 use std::fs::{self, File};
 use std::io::Write;
@@ -95,7 +93,7 @@ fn generate_deprecated_union_accessors(bindings: &str) -> String {
     }
 
     let mut impl_builder = UnionImplBuilder::default();
-    syn::visit::visit_file(&mut impl_builder, &syn::parse_file(&bindings).unwrap());
+    syn::visit::visit_file(&mut impl_builder, &syn::parse_file(bindings).unwrap());
 
     impl_builder.impls
 }
@@ -121,18 +119,15 @@ impl super::BuildConfig {
         // uses the correct headers
         let compiler = cc.get_compiler();
         if compiler.is_like_gnu() {
-            let output = compiler.to_command().args(&["--print-sysroot"]).output();
-            match output {
-                Ok(sysroot) => {
-                    let path = std::str::from_utf8(&sysroot.stdout).expect("Malformed sysroot");
-                    let trimmed_path = path
-                        .strip_suffix("\r\n")
-                        .or(path.strip_suffix("\n"))
-                        .unwrap_or(&path);
-                    cc.flag(&format!("--sysroot={}", trimmed_path));
-                }
-                _ => {} // skip toolchains without a configured sysroot
-            };
+            let output = compiler.to_command().args(["--print-sysroot"]).output();
+            if let Ok(sysroot) = output {
+                let path = std::str::from_utf8(&sysroot.stdout).expect("Malformed sysroot");
+                let trimmed_path = path
+                    .strip_suffix("\r\n")
+                    .or_else(|| path.strip_suffix('\n'))
+                    .unwrap_or(path);
+                cc.flag(&format!("--sysroot={}", trimmed_path));
+            }; // Otherwise, skip toolchains without a configured sysroot
         }
 
         let bindings = bindgen::builder()

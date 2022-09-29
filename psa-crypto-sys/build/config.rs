@@ -31,7 +31,7 @@ impl Macro {
 
 pub type CDefine = (&'static str, Macro);
 
-pub const PREFIX: &'static str = r#"
+pub const PREFIX: &str = r#"
 #ifndef MBEDTLS_CONFIG_H
 #define MBEDTLS_CONFIG_H
 
@@ -51,8 +51,8 @@ like:
 and then merged in below
 */
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
-const DEFAULT_DEFINES: &'static [CDefine] = &[
+#[rustfmt::skip]
+const DEFAULT_DEFINES: &[CDefine] = &[
     ("MBEDTLS_CONFIG_VERSION",                            Undefined), // default: 0x03000000
     ("MBEDTLS_HAVE_ASM",                                  Defined),
     ("MBEDTLS_NO_UDBL_DIVISION",                          Undefined),
@@ -359,8 +359,8 @@ pub fn default_defines() -> HashMap<&'static str, Macro> {
     defines
 }
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
-pub const FEATURE_DEFINES: &'static [(&'static str, CDefine)] = &[
+#[rustfmt::skip]
+pub const FEATURE_DEFINES: &[(&str, CDefine)] = &[
     ("time",                  ("MBEDTLS_HAVE_TIME",                         Defined)),
     ("time",                  ("MBEDTLS_HAVE_TIME_DATE",                    Defined)),
     ("havege",                ("MBEDTLS_HAVEGE_C",                          Undefined)),
@@ -383,8 +383,8 @@ pub const FEATURE_DEFINES: &'static [(&'static str, CDefine)] = &[
     ("trusted_cert_callback", ("MBEDTLS_X509_TRUSTED_CERTIFICATE_CALLBACK", Defined)),
 ];
 
-#[cfg_attr(rustfmt, rustfmt_skip)]
-pub const PLATFORM_DEFINES: &'static [(&'static str, &'static str, CDefine)] = &[
+#[rustfmt::skip]
+pub const PLATFORM_DEFINES: &[(&str, &str, CDefine)] = &[
     ("time",      "libc",     ("MBEDTLS_TIMING_C",                          Defined)),
     ("time",      "custom",   ("MBEDTLS_PLATFORM_TIME_MACRO",               DefinedAs("mbedtls_time"))),
     ("time",      "custom",   ("MBEDTLS_PLATFORM_TIME_TYPE_MACRO",          DefinedAs("long long"))),
@@ -397,7 +397,7 @@ pub const PLATFORM_DEFINES: &'static [(&'static str, &'static str, CDefine)] = &
     ("std",       "entropy",  ("MBEDTLS_ENTROPY_C",                         Defined)),
 ];
 
-pub const SUFFIX: &'static str = r#"
+pub const SUFFIX: &str = r#"
 #if defined(TARGET_LIKE_MBED)
 #include "mbedtls/target_config.h"
 #endif

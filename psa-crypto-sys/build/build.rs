@@ -195,7 +195,7 @@ mod operations {
 
         use std::process::Command;
         Command::new("git")
-            .args(&[
+            .args([
                 "clone",
                 "-c",
                 "advice.detachedHead=false",
@@ -205,14 +205,14 @@ mod operations {
             .status()?;
         match arch.as_str() {
             "xtensa-esp32-none-elf" => {
-                Command::new("cp").args(&["xtensa.mk", &out_dir]).status()?;
+                Command::new("cp").args(["xtensa.mk", &out_dir]).status()?;
                 Command::new("make")
-                    .args(&["-C", &mbed_build_path, "-f", "../xtensa.mk"])
+                    .args(["-C", mbed_build_path, "-f", "../xtensa.mk"])
                     .status()?;
             }
             "i686-unknown-linux-gnu" => {
                 Command::new("make")
-                    .args(&[
+                    .args([
                         "-C",
                         mbed_build_path,
                         "lib",
@@ -224,7 +224,7 @@ mod operations {
             }
             _ => {
                 Command::new("make")
-                    .args(&[
+                    .args([
                         "-C",
                         mbed_build_path,
                         "lib",

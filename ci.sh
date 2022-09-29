@@ -27,10 +27,11 @@ RUST_BACKTRACE=1 cargo build --target aarch64-unknown-linux-gnu
 #################
 # On native target clippy or fmt might not be available.
 if cargo fmt -h; then
-	echo TODO: cargo fmt --all -- --check
+	cargo fmt --all -- --check
 fi
 if cargo clippy -h; then
-	echo TODO: cargo clippy --all-targets -- -D clippy::all -D clippy::cargo
+	# TODO: some errors still need to be assessed
+	echo SKIP: cargo clippy --all-targets -- -D clippy::all -D clippy::cargo
 fi
 
 #############
@@ -64,7 +65,7 @@ popd
 
 # Clean before to only build the interface
 cargo clean
-echo "WIP !!!!" && exit 0
+echo "TODO: match linking behaviors" && exit 0
 # FIXME: Error: Custom { kind: Other, error: "both environment variables MBEDTLS_LIB_DIR and MBEDTLS_INCLUDE_DIR need to be set for operations feature" }
 MBEDTLS_INCLUDE_DIR=$(pwd)/mbedtls/include cargo build --release --no-default-features --features "minerva interface"
 
