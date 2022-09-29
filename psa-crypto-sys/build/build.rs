@@ -33,9 +33,9 @@
 mod config;
 mod features;
 mod headers;
+mod mbedtls;
 #[path = "bindgen.rs"]
 mod mod_bindgen;
-mod mbedtls;
 
 #[macro_use]
 extern crate lazy_static;
@@ -194,23 +194,45 @@ mod operations {
         }
 
         use std::process::Command;
-        Command::new("git").args(&["clone", "-c", "advice.detachedHead=false",
-            mbedtls_dir, mbed_build_path]).status()?;
+        Command::new("git")
+            .args(&[
+                "clone",
+                "-c",
+                "advice.detachedHead=false",
+                mbedtls_dir,
+                mbed_build_path,
+            ])
+            .status()?;
         match arch.as_str() {
             "xtensa-esp32-none-elf" => {
                 Command::new("cp").args(&["xtensa.mk", &out_dir]).status()?;
-                Command::new("make").args(&["-C", &mbed_build_path,
-                    "-f", "../xtensa.mk"]).status()?;
-            },
+                Command::new("make")
+                    .args(&["-C", &mbed_build_path, "-f", "../xtensa.mk"])
+                    .status()?;
+            }
             "i686-unknown-linux-gnu" => {
-                Command::new("make").args(&["-C", mbed_build_path, "lib",
-                    "-j", "CFLAGS=-O2 -m32 -DMBEDTLS_USE_PSA_CRYPTO=1",
-                    "LDFLAGS=-m32"]).status()?;
-            },
+                Command::new("make")
+                    .args(&[
+                        "-C",
+                        mbed_build_path,
+                        "lib",
+                        "-j",
+                        "CFLAGS=-O2 -m32 -DMBEDTLS_USE_PSA_CRYPTO=1",
+                        "LDFLAGS=-m32",
+                    ])
+                    .status()?;
+            }
             _ => {
-                Command::new("make").args(&["-C", mbed_build_path, "lib",
-                    "-j", "CFLAGS=-O2 -DMBEDTLS_USE_PSA_CRYPTO=1"]).status()?;
-            },
+                Command::new("make")
+                    .args(&[
+                        "-C",
+                        mbed_build_path,
+                        "lib",
+                        "-j",
+                        "CFLAGS=-O2 -DMBEDTLS_USE_PSA_CRYPTO=1",
+                    ])
+                    .status()?;
+            }
         }
 
         Ok(PathBuf::from(mbed_build_path))

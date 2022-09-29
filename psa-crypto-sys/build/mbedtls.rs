@@ -8,13 +8,13 @@
  * option. This file may not be copied, modified, or distributed except
  * according to those terms. */
 
+use crate::config;
+use crate::features::FEATURES;
+use crate::headers;
 use std::env;
 use std::fs::File;
 use std::io::Write;
 use std::path::{Path, PathBuf};
-use crate::features::FEATURES;
-use crate::config;
-use crate::headers;
 
 pub struct BuildConfig {
     pub out_dir: PathBuf,
@@ -84,7 +84,8 @@ impl BuildConfig {
     pub fn new() -> Self {
         let out_dir = PathBuf::from(env::var_os("OUT_DIR").expect("OUT_DIR environment not set?"));
         let config_h = out_dir.join("config.h");
-        let mbedtls_src = PathBuf::from(env::var("RUST_MBEDTLS_SYS_SOURCE").unwrap_or("vendor".to_owned()));
+        let mbedtls_src =
+            PathBuf::from(env::var("RUST_MBEDTLS_SYS_SOURCE").unwrap_or("vendor".to_owned()));
         let mbedtls_include = mbedtls_src.join("include");
 
         let mut cflags = vec![];
@@ -104,4 +105,3 @@ impl BuildConfig {
         }
     }
 }
-
