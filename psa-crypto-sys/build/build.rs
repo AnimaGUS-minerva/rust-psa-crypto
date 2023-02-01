@@ -228,7 +228,7 @@ mod operations {
                         mbed_build_path,
                         "lib",
                         "-j",
-                        "CFLAGS=-O2 -DMBEDTLS_USE_PSA_CRYPTO=1",
+                        "CFLAGS=-O2 -fPIC -DMBEDTLS_USE_PSA_CRYPTO=1",
                     ])
                     .status()?;
             }
