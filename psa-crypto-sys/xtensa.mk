@@ -1,7 +1,7 @@
 all: psa-xtensa
 
 psa-xtensa: patch-config-xtensa patch-entropy-poll patch-x509-crt patch-cipher-info-from-string-xtensa patch-rsa patch-fclose
-	make -j CC=$(XTENSA_GCC) CFLAGS="-O2 -DMBEDTLS_USE_PSA_CRYPTO=1" lib
+	make -j CC=$(XTENSA_GCC) CFLAGS="-O2 -mlongcalls -DMBEDTLS_USE_PSA_CRYPTO=1" lib
 
 CONFIG_H_FILE := include/mbedtls/mbedtls_config.h
 patch-config-xtensa:
