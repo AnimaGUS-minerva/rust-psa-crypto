@@ -2,14 +2,24 @@
 name = "psa-crypto-sys"
 version = "0.12.0"
 authors = ["Parsec Project Contributors"]
-edition = "2018"
-description = "Wrapper around the PSA Cryptography API"
+build = "minerva/build.rs"
+edition = "2021"
+description = "Wrapper around the PSA Cryptography API and MBEDTLS API"
 readme = "README.md"
-keywords = ["psa", "crypto", "cryptography"]
+keywords = ["psa", "crypto", "cryptography", "mbedtls"]
 categories = ["api-bindings", "external-ffi-bindings", "cryptography"]
 license = "Apache-2.0"
-repository = "https://github.com/parallaxsecond/rust-psa-crypto"
+repository = "https://github.com/AnimaGUS-minerva/rust-psa-crypto"
 rust-version = "1.66.0"
+links = "mbedcrypto"
+
+[dependencies]
+cfg-if = "1.0.0"
+libz-sys = { version = "1.0.0", optional = true }
+libc = { version = "0.2.0", optional = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { version = "0.2.0" }
 
 [build-dependencies]
 bindgen = { version = "0.69.4", optional = true }
@@ -18,10 +28,52 @@ cmake = "0.1.44"
 regex = "1.9.1"
 walkdir = "2.3.1"
 pkg-config = "0.3.29"
+lazy_static = "1.4"
+syn = { version = "1.0.64", features = ["full", "visit"] }
+quote = "1.0.9"
 
 [features]
-default = ["operations"]
+default = [
+    # psa-crypto features
+    "operations",
+    # mbedtls features
+    "std", "debug", "threading", "zlib", "time", "aesni", "padlock", "legacy_protocols",
+]
+minerva-nostd = [
+    "operations",
+           "debug", "threading",         "time", "aesni", "padlock", "legacy_protocols",
+]
 static = []
 interface = ["bindgen"]
 operations = ["interface"]
 prefix = []
+minerva-fs-workaround = []
+minerva-time-workaround = []
+# If you use mbedtls-sys in a no_std configuration, you need to provide your
+# own versions of the following functions:
+#
+# * calloc/free
+# * strstr/strlen/strncpy/strncmp/strcmp/snprintf
+# * memmove/memcpy/memcmp/memset
+# * rand/printf (used only for self tests. optionally use custom_printf)
+std = ["debug"] # deprecated automatic enabling of debug, can be removed on major version bump
+debug = []
+custom_printf = []
+custom_has_support = []
+aes_alt = []
+threading = []
+time = []
+havege = ["time"]
+zlib = ["libz-sys"]
+pkcs11 = []
+aesni = []
+padlock = []
+legacy_protocols = []
+mpi_force_c_code = []
+trusted_cert_callback = []
+# deprecated, needed for backcompat, can be removed on major version bump
+custom_threading = ["threading"]
+custom_time = ["time"]
+custom_gmtime_r = ["time"]
+# deprecated features, these don't do anything anymore, can be removed on major version bump
+pthread = ["threading"]

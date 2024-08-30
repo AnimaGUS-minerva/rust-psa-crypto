@@ -23,8 +23,9 @@ rand = "0.8.4"
 base64 = "0.12.3"
 
 [features]
-default = ["operations"]
+default = ["operations", "no-std"]
 operations = ["psa-crypto-sys/operations", "interface"]
 interface = ["psa-crypto-sys/interface"]
 prefix = ["psa-crypto-sys/prefix"]
-std = []
+no-std = []
+minerva = ["psa-crypto-sys/minerva-nostd", "psa-crypto-sys/minerva-fs-workaround", "psa-crypto-sys/minerva-time-workaround"]

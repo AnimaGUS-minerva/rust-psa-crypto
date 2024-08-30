@@ -7,6 +7,8 @@
 //! You can find the API
 //! [here](https://developer.arm.com/architectures/security-architectures/platform-security-architecture/documentation).
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::missing_safety_doc)]
@@ -26,6 +28,8 @@ mod psa_crypto_binding {
     #![allow(unused_imports)]
     include!(concat!(env!("OUT_DIR"), "/shim_bindings.rs"));
 }
+
+pub mod mbedtls;
 
 mod constants;
 #[cfg(feature = "interface")]

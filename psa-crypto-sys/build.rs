@@ -4,7 +4,7 @@
 #![allow(renamed_and_removed_lints, unknown_lints)]
 #![deny(
     nonstandard_style,
-    dead_code,
+// @@    dead_code,
     improper_ctypes,
     non_shorthand_field_patterns,
     no_mangle_generic_items,
@@ -17,7 +17,7 @@
     renamed_and_removed_lints,
     unconditional_recursion,
     unnameable_types,
-    unused,
+// @@    unused,
     unused_allocation,
     unused_comparisons,
     unused_parens,
@@ -56,7 +56,8 @@ fn main() -> std::io::Result<()> {
 }
 
 #[cfg(any(feature = "interface", feature = "operations"))]
-mod common {
+//mod common {
+pub mod common { // @@
     pub const CONFIG_FILE: &str = "custom_config.h";
 
     #[cfg(feature = "prefix")]
@@ -254,7 +255,8 @@ mod interface {
 }
 
 #[cfg(feature = "operations")]
-mod operations {
+//mod operations {
+pub mod operations { // @@
     use super::common;
     #[cfg(feature = "prefix")]
     use super::common::prefix;
@@ -301,7 +303,8 @@ mod operations {
         Ok(())
     }
 
-    fn compile_mbed_crypto() -> Result<PathBuf> {
+    //fn compile_mbed_crypto() -> Result<PathBuf> {
+    pub fn compile_mbed_crypto() -> Result<PathBuf> { // @@
         let mbedtls_dir = String::from("./vendor");
         let out_dir = env::var("OUT_DIR").unwrap();
 
@@ -324,6 +327,19 @@ mod operations {
                 "-DMBEDTLS_CONFIG_FILE='\"{}\"'",
                 common::CONFIG_FILE
             ))
+            //---- @@ ---- CFLAGS=-O2 -fPIC -DMBEDTLS_USE_PSA_CRYPTO=1
+            /*
+            .cflag("-O2")
+            .cflag("-fPIC")
+            .cflag("-DMBEDTLS_USE_PSA_CRYPTO=1")
+            */
+            /*
+             * - vendor/docs/architecture/psa-migration/strategy.md
+             * - vendor/include/mbedtls/mbedtls_config.h where
+             *     `MBEDTLS_PSA_CRYPTO_CONFIG` is disabled by default
+            */
+            .define("MBEDTLS_PSA_CRYPTO_CONFIG", "1")
+            //----
             .define("ENABLE_PROGRAMS", "OFF")
             .define("ENABLE_TESTING", "OFF")
             .build();
