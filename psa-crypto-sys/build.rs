@@ -289,7 +289,7 @@ pub mod operations { // @@
         if !::std::process::Command::new(mbedtls_config)
             .arg("--write")
             .arg(&(out_dir + "/" + common::CONFIG_FILE))
-            .arg("crypto")
+            .arg("full")
             .status()
             .map_err(|_| Error::new(ErrorKind::Other, "configuring mbedtls failed"))?
             .success()
