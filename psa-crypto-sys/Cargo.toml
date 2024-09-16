@@ -34,8 +34,8 @@ quote = "1.0.9"
 
 [features]
 default = [
-    # psa-crypto features
-    "operations",
+    # psa-crypto features (builds library statically)
+    "operations", "static",
     # mbedtls features
     "std", "debug", "threading", "zlib", "time", "aesni", "padlock", "legacy_protocols",
 ]
