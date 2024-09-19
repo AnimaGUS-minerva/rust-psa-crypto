@@ -307,6 +307,7 @@ pub mod operations { // @@
     pub fn compile_mbed_crypto() -> Result<PathBuf> { // @@
         let mbedtls_dir = String::from("./vendor");
         let out_dir = env::var("OUT_DIR").unwrap();
+        let arch = env::var("TARGET").unwrap();
 
         // Rerun build if any file under the vendor directory has changed.
         for entry in WalkDir::new(&mbedtls_dir)
@@ -321,18 +322,11 @@ pub mod operations { // @@
         }
 
         // Build the MbedTLS libraries
-        let mbed_build_path = Config::new(&mbedtls_dir)
+        let mut cfg = Config::new(&mbedtls_dir);
+        let _ = cfg
             .cflag(format!("-I{}", out_dir))
-            .cflag(format!(
-                "-DMBEDTLS_CONFIG_FILE='\"{}\"'",
-                common::CONFIG_FILE
-            ))
-            //---- @@ ---- CFLAGS=-O2 -fPIC -DMBEDTLS_USE_PSA_CRYPTO=1
-            /*
-            .cflag("-O2")
-            .cflag("-fPIC")
-            .cflag("-DMBEDTLS_USE_PSA_CRYPTO=1")
-            */
+            .cflag(format!("-DMBEDTLS_CONFIG_FILE='\"{}\"'", common::CONFIG_FILE))
+            //---- @@
             /*
              * - vendor/docs/architecture/psa-migration/strategy.md
              * - vendor/include/mbedtls/mbedtls_config.h where
@@ -341,8 +335,17 @@ pub mod operations { // @@
             .define("MBEDTLS_PSA_CRYPTO_CONFIG", "1")
             //----
             .define("ENABLE_PROGRAMS", "OFF")
-            .define("ENABLE_TESTING", "OFF")
-            .build();
+            .define("ENABLE_TESTING", "OFF");
+
+        let mbed_build_path = match arch.as_str() {
+            "xtensa-esp32-none-elf" => todo!(),
+            "i686-unknown-linux-gnu" => cfg
+                .cflag("-mpclmul")
+                .cflag("-msse2")
+                .cflag("-maes")
+                .build(),
+            _ => cfg.build(),
+        };
 
         Ok(mbed_build_path)
     }
