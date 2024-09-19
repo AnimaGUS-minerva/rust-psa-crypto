@@ -1,3 +1,4 @@
 [submodule "psa-crypto-sys/vendor"]
 	path = psa-crypto-sys/vendor
-	url = https://github.com/ARMmbed/mbedtls.git
+	url  = https://github.com/AnimaGUS-minerva/mbedtls.git
+        
