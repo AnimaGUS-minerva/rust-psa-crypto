@@ -326,6 +326,9 @@ pub mod operations { // @@
         let _ = cfg
             .cflag(format!("-I{}", out_dir))
             .cflag(format!("-DMBEDTLS_CONFIG_FILE='\"{}\"'", common::CONFIG_FILE))
+            //---- @@ resolve symbols: `mbedtls_x509_crt_{init,parse,info,free}`
+            .cflag("-DMBEDTLS_X509_CRT_PARSE_C=1")
+            .cflag("-DMBEDTLS_X509_USE_C=1")
             //---- @@
             /*
              * - vendor/docs/architecture/psa-migration/strategy.md
