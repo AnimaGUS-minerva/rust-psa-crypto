@@ -128,55 +128,12 @@ mod common {
 
         Ok(())
     }
-
-    pub fn compile_shim_library(include_dir: String) -> Result<()> {
-        let out_dir = env::var("OUT_DIR").unwrap();
-
-        let mut cfg = cc::Build::new();
-        if is_xtensa() {
-            cfg.compiler(env::var("XTENSA_GCC").expect("XTENSA_GCC"));
-        }
-        cfg.include(&out_dir)
-            //.define("MBEDTLS_CONFIG_FILE", "<config.h>")
-            .define("MBEDTLS_CONFIG_FILE", format!("<{}>", CONFIG_FILE).as_str()) // @@
-            .include(include_dir)
-            .file("./src/c/shim.c")
-            .warnings(true)
-            .flag("-Werror")
-            .opt_level(2)
-            .try_compile("libshim.a")
-            .map_err(|_| Error::new(ErrorKind::Other, "compiling shim.c failed"))?;
-
-        // Also link shim library
-        println!("cargo:rustc-link-search=native={}", out_dir);
-        println!("cargo:rustc-link-lib=static=shim");
-
-        Ok(())
-    }
-
-    pub fn is_xtensa() -> bool {
-        env::var("TARGET").unwrap().as_str() == "xtensa-esp32-none-elf"
-    }
 }
 
 #[cfg(all(feature = "interface", not(feature = "operations")))]
 mod interface {
-    use super::common;
-    use std::env;
-    use std::io::{Error, ErrorKind, Result};
-
-    // Build script when the interface feature is on and not the operations one
     pub fn script_interface() -> Result<()> {
-        if let Ok(include_dir) = env::var("MBEDTLS_INCLUDE_DIR") {
-            common::configure_mbed_crypto()?;
-            common::generate_mbed_crypto_bindings(include_dir.clone())?;
-            common::compile_shim_library(include_dir)
-        } else {
-            Err(Error::new(
-                ErrorKind::Other,
-                "interface feature necessitates MBEDTLS_INCLUDE_DIR environment variable",
-            ))
-        }
+        crate::mod_build::interface::script_interface()
     }
 }
 
@@ -250,8 +207,6 @@ mod operations {
 
         common::generate_mbed_crypto_bindings(include.clone())?;
 
-        //common::compile_shim_library(include)
-        //==== TODO clean up
         crate::mod_build::common::compile_shim_library(include, false/*metadata*/, false/*external_mbedtls*/).and(Ok(()))
     }
 }
