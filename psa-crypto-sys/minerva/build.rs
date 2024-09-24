@@ -190,89 +190,6 @@ mod operations {
     use walkdir::WalkDir;
     use crate::mod_build::common::CONFIG_FILE;
 
-    fn compile_mbed_crypto_minerva(mbedtls_dir: &str) -> Result<PathBuf> {
-        let out_dir = env::var("OUT_DIR").unwrap();
-        let arch = env::var("TARGET").unwrap();
-        let mbed_build_path = &format!("{}/mbedtls-{}", out_dir, arch);
-
-        if std::path::Path::new(&mbed_build_path).exists() {
-            return Ok(PathBuf::from(mbed_build_path));
-        }
-
-        use std::process::Command;
-        Command::new("git")
-            .args([
-                "clone",
-                "-c",
-                "advice.detachedHead=false",
-                mbedtls_dir,
-                mbed_build_path,
-            ])
-            .status()?;
-        match arch.as_str() {
-            "xtensa-esp32-none-elf" => {
-                Command::new("cp").args(["xtensa.mk", &out_dir]).status()?;
-                Command::new("make")
-                    .args(["-C", mbed_build_path, "-f", "../xtensa.mk"])
-                    .status()?;
-            }
-            "i686-unknown-linux-gnu" => {
-                Command::new("make")
-                    .args([
-                        "-C",
-                        mbed_build_path,
-                        "lib",
-                        "-j",
-                        "CFLAGS=-O2 -m32 -DMBEDTLS_USE_PSA_CRYPTO=1",
-                        "LDFLAGS=-m32",
-                    ])
-                    .status()?;
-            }
-            _ => {
-                Command::new("make")
-                    .args([
-                        "-C",
-                        mbed_build_path,
-                        "lib",
-                        "-j",
-                        "CFLAGS=-O2 -fPIC -DMBEDTLS_USE_PSA_CRYPTO=1",
-                    ])
-                    .status()?;
-            }
-        }
-
-        Ok(PathBuf::from(mbed_build_path))
-    }
-
-    #[allow(unused)]
-    fn compile_mbed_crypto() -> Result<PathBuf> {
-        let mbedtls_dir = String::from("./vendor");
-        let out_dir = env::var("OUT_DIR").unwrap();
-
-        // Rerun build if any file under the vendor directory has changed.
-        for entry in WalkDir::new(&mbedtls_dir)
-            .into_iter()
-            .filter_map(|entry| entry.ok())
-        {
-            if let Ok(metadata) = entry.metadata() {
-                if metadata.is_file() {
-                    println!("cargo:rerun-if-changed={}", entry.path().display());
-                }
-            }
-        }
-
-        // Build the MbedTLS libraries
-        let mbed_build_path = Config::new(&mbedtls_dir)
-            .cflag(format!("-I{}", out_dir))
-            //.cflag("-DMBEDTLS_CONFIG_FILE='<config.h>'")
-            .cflag(format!("-DMBEDTLS_CONFIG_FILE=<{}>", CONFIG_FILE)) // @@
-            .define("ENABLE_PROGRAMS", "OFF")
-            .define("ENABLE_TESTING", "OFF")
-            .build();
-
-        Ok(mbed_build_path)
-    }
-
     fn link_to_lib(lib_path: String, link_statically: bool) {
         let link_type = if link_statically { "static" } else { "dylib" };
 
@@ -307,7 +224,6 @@ mod operations {
         } else {
             println!("Did not find environment variables, building MbedTLS!");
 
-            //let mut mbed_lib_dir = compile_mbed_crypto()?;
             let mut mbed_lib_dir = crate::mod_build::operations::compile_mbed_crypto()?; // @@
 
             let mut mbed_include_dir = mbed_lib_dir.clone();
