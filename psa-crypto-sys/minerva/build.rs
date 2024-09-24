@@ -55,81 +55,6 @@ fn main() -> std::io::Result<()> {
     Ok(())
 }
 
-#[cfg(any(feature = "interface", feature = "operations"))]
-mod common {
-    use std::env;
-    use std::io::{Error, ErrorKind, Result};
-    use std::path::{Path, PathBuf};
-    use crate::mod_build::common::CONFIG_FILE;
-
-    pub fn configure_mbed_crypto() -> Result<()> {
-        let mbedtls_dir = String::from("./vendor");
-        let mbedtls_config = mbedtls_dir + "/scripts/config.py";
-
-        println!("cargo:rerun-if-changed=src/c/shim.c");
-        println!("cargo:rerun-if-changed=src/c/shim.h");
-
-        let out_dir = env::var("OUT_DIR").unwrap();
-
-        //  Check for Mbed TLS sources
-        if !Path::new(&mbedtls_config).exists() {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "MbedTLS config.py is missing. Have you run 'git submodule update --init'?",
-            ));
-        }
-
-        // Configure the MbedTLS build for making Mbed Crypto
-        if !::std::process::Command::new(mbedtls_config)
-            .arg("--write")
-            .arg(&(out_dir + "/config.h"))
-            .arg("crypto")
-            .status()
-            .map_err(|_| Error::new(ErrorKind::Other, "configuring mbedtls failed"))?
-            .success()
-        {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "config.py returned an error status",
-            ));
-        }
-
-        Ok(())
-    }
-
-    pub fn generate_mbed_crypto_bindings(mbed_include_dir: String) -> Result<()> {
-        let header = mbed_include_dir.clone() + "/psa/crypto.h";
-
-        println!("cargo:rerun-if-changed={}", header);
-
-        let out_dir = env::var("OUT_DIR").unwrap();
-
-        let shim_bindings = bindgen::Builder::default()
-            .clang_arg(format!("-I{}", out_dir))
-            //.clang_arg("-DMBEDTLS_CONFIG_FILE=<config.h>")
-            .clang_arg(format!("-DMBEDTLS_CONFIG_FILE=<{}>", CONFIG_FILE)) // @@
-            .clang_arg(format!("-I{}", mbed_include_dir))
-            .rustfmt_bindings(true)
-            .header("src/c/shim.h")
-            .blocklist_type("max_align_t")
-            .use_core()
-            .ctypes_prefix("crate::mbedtls::types::raw_types")
-            .generate_comments(false)
-            .size_t_is_usize(true)
-            .generate()
-            .map_err(|_| {
-                Error::new(
-                    ErrorKind::Other,
-                    "Unable to generate bindings to mbed crypto",
-                )
-            })?;
-        let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-        shim_bindings.write_to_file(out_path.join("shim_bindings.rs"))?;
-
-        Ok(())
-    }
-}
-
 #[cfg(all(feature = "interface", not(feature = "operations")))]
 mod interface {
     pub fn script_interface() -> Result<()> {
@@ -139,13 +64,12 @@ mod interface {
 
 #[cfg(feature = "operations")]
 mod operations {
-    use super::common;
+    use crate::mod_build::common;
     use cmake::Config;
     use std::env;
     use std::io::{Error, ErrorKind, Result};
     use std::path::PathBuf;
     use walkdir::WalkDir;
-    use crate::mod_build::common::CONFIG_FILE;
 
     fn link_to_lib(lib_path: String, link_statically: bool) {
         let link_type = if link_statically { "static" } else { "dylib" };
@@ -205,8 +129,7 @@ mod operations {
         // Linking to PSA Crypto library is only needed for the operations.
         link_to_lib(lib, statically);
 
-        common::generate_mbed_crypto_bindings(include.clone())?;
-
-        crate::mod_build::common::compile_shim_library(include, false/*metadata*/, false/*external_mbedtls*/).and(Ok(()))
+        common::generate_mbed_crypto_bindings(include.clone(), false/*external_mbedtls*/)?;
+        common::compile_shim_library(include, false/*metadata*/, false/*external_mbedtls*/).and(Ok(()))
     }
 }
