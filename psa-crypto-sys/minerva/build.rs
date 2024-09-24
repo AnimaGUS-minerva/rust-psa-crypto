@@ -65,11 +65,8 @@ mod interface {
 #[cfg(feature = "operations")]
 mod operations {
     use crate::mod_build::common;
-    use cmake::Config;
     use std::env;
     use std::io::{Error, ErrorKind, Result};
-    use std::path::PathBuf;
-    use walkdir::WalkDir;
 
     fn link_to_lib(lib_path: String, link_statically: bool) {
         let link_type = if link_statically { "static" } else { "dylib" };
