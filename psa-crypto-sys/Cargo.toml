@@ -2,7 +2,7 @@
 name = "psa-crypto-sys"
 version = "0.12.0"
 authors = ["Parsec Project Contributors"]
-build = "minerva/build.rs"
+####build = "minerva/build.rs"
 edition = "2021"
 description = "Wrapper around the PSA Cryptography API and MBEDTLS API"
 readme = "README.md"

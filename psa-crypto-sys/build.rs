@@ -28,11 +28,28 @@
     unused_extern_crates,
     unused_import_braces,
     unused_qualifications,
-    unused_results,
+// @@    unused_results,
     missing_copy_implementations
 )]
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
+
+//---- ^^
+#[path = "minerva/config.rs"]
+mod config;
+#[path = "minerva/features.rs"]
+mod features;
+#[path = "minerva/headers.rs"]
+mod headers;
+#[path = "minerva/mbedtls.rs"]
+mod mbedtls;
+
+#[path = "minerva/bindgen.rs"]
+mod _impl_bindgen; // for `crate::mbedtls::BuildConfig`
+
+#[macro_use]
+extern crate lazy_static;
+//---- $$
 
 fn main() -> std::io::Result<()> {
     // If the prefix feature is not enabled then set the "CARGO_PKG_LINKS"
@@ -378,9 +395,59 @@ pub mod operations { // @@
 
     #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
     pub fn script_operations_with_mbedtls() -> Result<()> {
-        todo!();
+        let lib;
+        let include;
+        let statically;
 
-        Ok(())
+        if env::var("MBEDTLS_LIB_DIR").is_err() ^ env::var("MBEDTLS_INCLUDE_DIR").is_err() {
+            return Err(Error::new(
+                ErrorKind::Other,
+                "both environment variables MBEDTLS_LIB_DIR and MBEDTLS_INCLUDE_DIR need to be set for operations feature",
+            ));
+        }
+
+        //####crate::mod_build::operations::configure_mbed_crypto()?;
+        configure_mbed_crypto()?;
+
+        if let (Ok(lib_dir), Ok(include_dir)) =
+            (env::var("MBEDTLS_LIB_DIR"), env::var("MBEDTLS_INCLUDE_DIR"))
+        {
+            lib = lib_dir;
+            include = include_dir;
+            statically = cfg!(feature = "static") || env::var("MBEDCRYPTO_STATIC").is_ok();
+        } else {
+            println!("Did not find environment variables, building MbedTLS!");
+
+            //####let mut mbed_lib_dir = crate::mod_build::operations::compile_mbed_crypto()?; // @@
+            let mut mbed_lib_dir = compile_mbed_crypto()?;
+
+            let mut mbed_include_dir = mbed_lib_dir.clone();
+            mbed_lib_dir.push("lib");
+            if !mbed_lib_dir.as_path().exists() {
+                _ = mbed_lib_dir.pop();
+                mbed_lib_dir.push("lib64");
+            }
+            mbed_include_dir.push("include");
+
+            lib = mbed_lib_dir.to_str().unwrap().to_owned();
+            include = mbed_include_dir.to_str().unwrap().to_owned();
+            statically = true;
+            //external_mbedtls = false;
+
+            //####let cfg = super::BuildConfig::new();
+            let cfg = crate::mbedtls::BuildConfig::new();
+            cfg.create_config_h();
+            cfg.print_rerun_files();
+            cfg.bindgen();
+        }
+
+        // Linking to PSA Crypto library is only needed for the operations.
+        link_to_lib(lib, statically);
+
+        common::generate_mbed_crypto_bindings(include.clone(), false/*external_mbedtls*/)?;
+        common::compile_shim_library(include, false/*metadata*/, false/*external_mbedtls*/).and(Ok(()))
+
+        //Ok(())
     }
 
     #[cfg(not(feature = "prefix"))]
