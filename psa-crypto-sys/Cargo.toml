@@ -33,22 +33,15 @@ syn = { version = "1.0.64", features = ["full", "visit"] }
 quote = "1.0.9"
 
 [features]
-default = [
-    # psa-crypto features
-    "operations",
-    # mbedtls features
-    "std", "debug", "threading", "zlib", "time", "aesni", "padlock", "legacy_protocols",
-]
-minerva-nostd = [
-    "operations",
-           "debug", "threading",         "time", "aesni", "padlock", "legacy_protocols",
-]
+default = ["operations"]
 static = []
 interface = ["bindgen"]
 operations = ["interface"]
 prefix = []
-minerva-fs-workaround = []
-minerva-time-workaround = []
+mbedtls-std =   ["std", "debug", "threading", "zlib", "time", "aesni", "padlock", "legacy_protocols"]
+mbedtls-nostd = [       "debug", "threading",         "time", "aesni", "padlock", "legacy_protocols"]
+mbedtls-fs-workaround = []
+mbedtls-time-workaround = []
 # If you use mbedtls-sys in a no_std configuration, you need to provide your
 # own versions of the following functions:
 #
