@@ -45,8 +45,18 @@ fn main() -> std::io::Result<()> {
         env::set_var(cargo_pkg_links, "mbedcrypto");
     }
 
+    //==== orig
+    // #[cfg(feature = "operations")]
+    // return operations::script_operations();
+    //==== @@
     #[cfg(feature = "operations")]
-    return operations::script_operations();
+    {
+        #[cfg(not(any(feature = "mbedtls-std", feature = "mbedtls-nostd")))]
+        return operations::script_operations();
+        #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+        return operations::script_operations_with_mbedtls();
+    }
+    //====
 
     #[cfg(all(feature = "interface", not(feature = "operations")))]
     return interface::script_interface();
@@ -364,6 +374,13 @@ pub mod operations { // @@
         // Request rustc to link the Mbed Crypto library
         println!("cargo:rustc-link-search=native={}", lib_path,);
         println!("cargo:rustc-link-lib={}=mbedcrypto", link_type);
+    }
+
+    #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+    pub fn script_operations_with_mbedtls() -> Result<()> {
+        todo!();
+
+        Ok(())
     }
 
     #[cfg(not(feature = "prefix"))]
