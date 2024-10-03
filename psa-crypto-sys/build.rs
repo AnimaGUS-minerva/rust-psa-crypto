@@ -411,7 +411,6 @@ pub mod operations { // @@
             ));
         }
 
-        //####crate::mod_build::operations::configure_mbed_crypto()?;
         configure_mbed_crypto()?;
 
         if let (Ok(lib_dir), Ok(include_dir)) =
@@ -423,9 +422,7 @@ pub mod operations { // @@
         } else {
             println!("Did not find environment variables, building MbedTLS!");
 
-            //####let mut mbed_lib_dir = crate::mod_build::operations::compile_mbed_crypto()?; // @@
             let mut mbed_lib_dir = compile_mbed_crypto()?;
-
             let mut mbed_include_dir = mbed_lib_dir.clone();
             mbed_lib_dir.push("lib");
             if !mbed_lib_dir.as_path().exists() {
@@ -439,7 +436,6 @@ pub mod operations { // @@
             statically = true;
             //external_mbedtls = false;
 
-            //####let cfg = super::BuildConfig::new();
             let cfg = crate::mbedtls::BuildConfig::new();
             cfg.create_config_h();
             cfg.print_rerun_files();

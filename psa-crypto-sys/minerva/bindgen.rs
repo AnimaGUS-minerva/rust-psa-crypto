@@ -98,7 +98,6 @@ fn generate_deprecated_union_accessors(bindings: &str) -> String {
     impl_builder.impls
 }
 
-//####impl super::BuildConfig {
 impl crate::mbedtls::BuildConfig {
     pub fn bindgen(&self) {
         let mut input = String::new();
