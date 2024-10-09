@@ -10,9 +10,9 @@
 extern crate core;
 
 pub mod types;
-include!(concat!(env!("OUT_DIR"), "/mod-bindings.rs"));
+include!(concat!(env!("OUT_DIR"), "/mbedtls_bindings.rs"));
 
-pub use bindings::*;
+pub use _mbedtls_bindings::*;
 
 /* This value is defined by a C function macro, something which is not supported by bindgen currently
    https://github.com/rust-lang-nursery/rust-bindgen/issues/231

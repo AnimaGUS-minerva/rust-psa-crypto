@@ -163,7 +163,7 @@ impl crate::mbedtls::BuildConfig {
 
         let union_impls = generate_deprecated_union_accessors(&bindings);
 
-        let bindings_rs = self.out_dir.join("bindings.rs");
+        let bindings_rs = self.out_dir.join("_mbedtls_bindings.rs");
         File::create(&bindings_rs)
             .and_then(|mut f| {
                 f.write_all(bindings.as_bytes())?;
@@ -171,9 +171,9 @@ impl crate::mbedtls::BuildConfig {
                 f.write_all(b"use crate::mbedtls::types::*;\n")?; // for FILE, time_t, etc.
                 Ok(())
             })
-            .expect("bindings.rs I/O error");
+            .expect("_mbedtls_bindings.rs I/O error");
 
-        let mod_bindings = self.out_dir.join("mod-bindings.rs");
-        fs::write(mod_bindings, b"mod bindings;\n").expect("mod-bindings.rs I/O error");
+        let mod_bindings = self.out_dir.join("mbedtls_bindings.rs");
+        fs::write(mod_bindings, b"mod _mbedtls_bindings;\n").expect("mbedtls_bindings.rs I/O error");
     }
 }
