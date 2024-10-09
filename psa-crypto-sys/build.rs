@@ -4,7 +4,7 @@
 #![allow(renamed_and_removed_lints, unknown_lints)]
 #![deny(
     nonstandard_style,
-// @@    dead_code,
+    dead_code,
     improper_ctypes,
     non_shorthand_field_patterns,
     no_mangle_generic_items,
@@ -17,7 +17,7 @@
     renamed_and_removed_lints,
     unconditional_recursion,
     unnameable_types,
-// @@    unused,
+    unused,
     unused_allocation,
     unused_comparisons,
     unused_parens,
@@ -62,18 +62,8 @@ fn main() -> std::io::Result<()> {
         env::set_var(cargo_pkg_links, "mbedcrypto");
     }
 
-    //==== orig
-    // #[cfg(feature = "operations")]
-    // return operations::script_operations();
-    //==== @@
     #[cfg(feature = "operations")]
-    {
-        #[cfg(not(any(feature = "mbedtls-std", feature = "mbedtls-nostd")))]
-        return operations::script_operations();
-        #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
-        return operations::script_operations_with_mbedtls();
-    }
-    //====
+    return operations::script_operations();
 
     #[cfg(all(feature = "interface", not(feature = "operations")))]
     return interface::script_interface();
@@ -83,8 +73,7 @@ fn main() -> std::io::Result<()> {
 }
 
 #[cfg(any(feature = "interface", feature = "operations"))]
-//mod common {
-pub mod common { // @@
+mod common {
     pub const CONFIG_FILE: &str = "custom_config.h";
 
     #[cfg(feature = "prefix")]
@@ -286,8 +275,7 @@ mod interface {
 }
 
 #[cfg(feature = "operations")]
-//mod operations {
-pub mod operations { // @@
+mod operations {
     use super::common;
     #[cfg(feature = "prefix")]
     use super::common::prefix;
@@ -334,8 +322,7 @@ pub mod operations { // @@
         Ok(())
     }
 
-    //fn compile_mbed_crypto() -> Result<PathBuf> {
-    pub fn compile_mbed_crypto() -> Result<PathBuf> { // @@
+    fn compile_mbed_crypto() -> Result<PathBuf> {
         let mbedtls_dir = String::from("./vendor");
         let out_dir = env::var("OUT_DIR").unwrap();
         let arch = env::var("TARGET").unwrap();
@@ -398,59 +385,6 @@ pub mod operations { // @@
         }
     }
 
-    #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
-    pub fn script_operations_with_mbedtls() -> Result<()> {
-        let lib;
-        let include;
-        let statically;
-
-        if env::var("MBEDTLS_LIB_DIR").is_err() ^ env::var("MBEDTLS_INCLUDE_DIR").is_err() {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "both environment variables MBEDTLS_LIB_DIR and MBEDTLS_INCLUDE_DIR need to be set for operations feature",
-            ));
-        }
-
-        configure_mbed_crypto()?;
-
-        if let (Ok(lib_dir), Ok(include_dir)) =
-            (env::var("MBEDTLS_LIB_DIR"), env::var("MBEDTLS_INCLUDE_DIR"))
-        {
-            lib = lib_dir;
-            include = include_dir;
-            statically = cfg!(feature = "static") || env::var("MBEDCRYPTO_STATIC").is_ok();
-        } else {
-            println!("Did not find environment variables, building MbedTLS!");
-
-            let mut mbed_lib_dir = compile_mbed_crypto()?;
-            let mut mbed_include_dir = mbed_lib_dir.clone();
-            mbed_lib_dir.push("lib");
-            if !mbed_lib_dir.as_path().exists() {
-                _ = mbed_lib_dir.pop();
-                mbed_lib_dir.push("lib64");
-            }
-            mbed_include_dir.push("include");
-
-            lib = mbed_lib_dir.to_str().unwrap().to_owned();
-            include = mbed_include_dir.to_str().unwrap().to_owned();
-            statically = true;
-            //external_mbedtls = false;
-
-            let cfg = crate::mbedtls::BuildConfig::new();
-            cfg.create_config_h();
-            cfg.print_rerun_files();
-            cfg.bindgen();
-        }
-
-        // Linking to PSA Crypto library is only needed for the operations.
-        link_to_lib(lib, statically);
-
-        common::generate_mbed_crypto_bindings(include.clone(), false/*external_mbedtls*/)?;
-        common::compile_shim_library(include, false/*metadata*/, false/*external_mbedtls*/).and(Ok(()))
-
-        //Ok(())
-    }
-
     #[cfg(not(feature = "prefix"))]
     // Build script when the operations feature is on
     pub fn script_operations() -> Result<()> {
@@ -484,6 +418,14 @@ pub mod operations { // @@
                 statically = true;
                 external_mbedtls = false;
             }
+        }
+
+        #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+        {
+            let cfg = crate::mbedtls::BuildConfig::new();
+            cfg.create_config_h();
+            cfg.print_rerun_files();
+            cfg.bindgen();
         }
 
         // Linking to PSA Crypto library is only needed for the operations.
