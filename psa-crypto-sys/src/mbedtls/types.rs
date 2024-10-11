@@ -112,8 +112,8 @@ extern crate libz_sys;
 #[cfg(feature = "zlib")]
 pub use self::libz_sys::z_stream;
 
-#[cfg(feature = "pkcs11")]
-const ERROR: _PKCS11_NOT_SUPPORTED_ = ();
+//#[cfg(feature = "pkcs11")]
+//const ERROR: _PKCS11_NOT_SUPPORTED_ = ();
 
 // cf. vendor/include/psa/crypto_types.h
 pub type psa_algorithm_t = u32;

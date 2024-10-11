@@ -29,6 +29,7 @@ mod psa_crypto_binding {
     include!(concat!(env!("OUT_DIR"), "/shim_bindings.rs"));
 }
 
+#[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
 pub mod mbedtls;
 
 mod constants;

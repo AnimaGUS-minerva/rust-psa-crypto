@@ -171,6 +171,15 @@ mod common {
         }
     }
 
+    pub fn generate_mbed_tls_bindings() -> Result<()> {
+        let cfg = crate::mbedtls::BuildConfig::new();
+        cfg.create_config_h();
+        cfg.print_rerun_files();
+        cfg.bindgen();
+
+        Ok(())
+    }
+
     pub fn generate_mbed_crypto_bindings(
         mbed_include_dir: String,
         external_mbedtls: bool,
@@ -188,12 +197,15 @@ mod common {
             .clang_arg(format!("-I{}", mbed_include_dir))
             .header("src/c/shim.h")
             .blocklist_type("max_align_t")
-            //---- @@
-            .use_core()
-            .ctypes_prefix("crate::mbedtls::types::raw_types")
-            //----
             .generate_comments(false)
             .size_t_is_usize(true);
+
+        #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+        {
+            shim_builder = shim_builder
+                .use_core()
+                .ctypes_prefix("crate::mbedtls::types::raw_types");
+        }
 
         #[cfg(feature = "prefix")]
         {
@@ -421,12 +433,7 @@ mod operations {
         }
 
         #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
-        {
-            let cfg = crate::mbedtls::BuildConfig::new();
-            cfg.create_config_h();
-            cfg.print_rerun_files();
-            cfg.bindgen();
-        }
+        common::generate_mbed_tls_bindings()?;
 
         // Linking to PSA Crypto library is only needed for the operations.
         link_to_lib(lib, statically);
@@ -487,6 +494,9 @@ mod operations {
                 println!("cargo:rustc-link-lib=static={}", shim_lib_name);
             }
         }
+
+        #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+        common::generate_mbed_tls_bindings()?;
 
         Ok(())
     }
