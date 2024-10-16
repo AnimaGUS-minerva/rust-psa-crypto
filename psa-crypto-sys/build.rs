@@ -355,7 +355,10 @@ mod operations {
         let mut cfg = Config::new(&mbedtls_dir);
         let _ = cfg
             .cflag(format!("-I{}", out_dir))
-            .cflag(format!("-DMBEDTLS_CONFIG_FILE='\"{}\"'", common::CONFIG_FILE))
+            .cflag(format!(
+                "-DMBEDTLS_CONFIG_FILE='\"{}\"'",
+                common::CONFIG_FILE
+            ))
             //---- @@ resolve symbols: `mbedtls_x509_crt_{init,parse,info,free}`
             .cflag("-DMBEDTLS_X509_CRT_PARSE_C=1")
             .cflag("-DMBEDTLS_X509_USE_C=1")
@@ -364,7 +367,7 @@ mod operations {
              * - vendor/docs/architecture/psa-migration/strategy.md
              * - vendor/include/mbedtls/mbedtls_config.h where
              *     `MBEDTLS_PSA_CRYPTO_CONFIG` is disabled by default
-            */
+             */
             .define("MBEDTLS_PSA_CRYPTO_CONFIG", "1")
             //----
             .define("ENABLE_PROGRAMS", "OFF")
@@ -372,11 +375,9 @@ mod operations {
 
         let mbed_build_path = match arch.as_str() {
             "xtensa-esp32-none-elf" => todo!(),
-            "i686-unknown-linux-gnu" => cfg
-                .cflag("-mpclmul")
-                .cflag("-msse2")
-                .cflag("-maes")
-                .build(),
+            "i686-unknown-linux-gnu" => {
+                cfg.cflag("-mpclmul").cflag("-msse2").cflag("-maes").build()
+            }
             _ => cfg.build(),
         };
 

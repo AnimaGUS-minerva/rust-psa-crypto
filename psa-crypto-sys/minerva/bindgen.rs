@@ -174,6 +174,7 @@ impl crate::mbedtls::BuildConfig {
             .expect("_mbedtls_bindings.rs I/O error");
 
         let mod_bindings = self.out_dir.join("mbedtls_bindings.rs");
-        fs::write(mod_bindings, b"mod _mbedtls_bindings;\n").expect("mbedtls_bindings.rs I/O error");
+        fs::write(mod_bindings, b"mod _mbedtls_bindings;\n")
+            .expect("mbedtls_bindings.rs I/O error");
     }
 }
