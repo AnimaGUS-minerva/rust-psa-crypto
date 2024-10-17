@@ -110,7 +110,7 @@ impl crate::mbedtls::BuildConfig {
         }
 
         let mut cc = cc::Build::new();
-        cc.include(&self.mbedtls_include).flag(&format!(
+        cc.include(&self.mbedtls_include).flag(format!(
             "-DMBEDTLS_CONFIG_FILE=\"{}\"",
             self.config_h.to_str().expect("config.h UTF-8 error")
         ));
@@ -131,7 +131,7 @@ impl crate::mbedtls::BuildConfig {
                     .strip_suffix("\r\n")
                     .or_else(|| path.strip_suffix('\n'))
                     .unwrap_or(path);
-                cc.flag(&format!("--sysroot={}", trimmed_path));
+                cc.flag(format!("--sysroot={}", trimmed_path));
             }; // Otherwise, skip toolchains without a configured sysroot
         }
 

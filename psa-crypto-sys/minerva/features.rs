@@ -85,11 +85,7 @@ impl Features {
 
     fn with_feature(&mut self, feature: &'static str) -> Option<&mut HashSet<&'static str>> {
         if self.have_feature(feature) {
-            Some(
-                self.platform_components
-                    .entry(feature)
-                    .or_insert_with(HashSet::new),
-            )
+            Some(self.platform_components.entry(feature).or_default())
         } else {
             None
         }

@@ -33,6 +33,7 @@
 )]
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::redundant_feature_names)]
 
 //---- ^^
 #[path = "minerva/config.rs"]
@@ -252,7 +253,7 @@ mod common {
             .cargo_metadata(metadata);
 
         if !external_mbedtls {
-            _ = cfg.flag(&format!("-DMBEDTLS_CONFIG_FILE=\"{}\"", CONFIG_FILE));
+            _ = cfg.flag(format!("-DMBEDTLS_CONFIG_FILE=\"{}\"", CONFIG_FILE));
         }
 
         cfg.try_compile(shimlib_name)
