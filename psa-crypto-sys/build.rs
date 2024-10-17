@@ -172,6 +172,7 @@ mod common {
         }
     }
 
+    #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
     pub fn generate_mbed_tls_bindings() -> Result<()> {
         let cfg = crate::mbedtls::BuildConfig::new();
         cfg.create_config_h();
