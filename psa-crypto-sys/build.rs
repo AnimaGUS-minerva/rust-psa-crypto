@@ -33,7 +33,6 @@
 )]
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
-#![allow(clippy::redundant_feature_names)]
 
 //---- ^^
 #[path = "minerva/config.rs"]

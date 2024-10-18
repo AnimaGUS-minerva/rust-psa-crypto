@@ -44,6 +44,7 @@
 )]
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
+#![allow(clippy::too_long_first_doc_paragraph)]
 
 #[cfg(feature = "operations")]
 pub mod operations;
