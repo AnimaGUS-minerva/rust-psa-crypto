@@ -24,7 +24,7 @@ lazy_static! {
 impl Features {
     fn init(&mut self) {
         if env_have_target_cfg("env", "sgx") {
-            self.automatic_features.insert("custom_has_support");
+            self.automatic_features.insert("custom_has");
             self.automatic_features.insert("aes_alt");
             self.automatic_features.insert("aesni");
         }
