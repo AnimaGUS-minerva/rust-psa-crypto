@@ -44,6 +44,7 @@ mod headers;
 #[path = "minerva/mbedtls.rs"]
 mod mbedtls;
 
+#[cfg(feature = "bindgen")]
 #[path = "minerva/bindgen.rs"]
 mod _impl_bindgen; // for `crate::mbedtls::BuildConfig`
 
