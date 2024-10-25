@@ -34,24 +34,6 @@
 // This one is hard to avoid.
 #![allow(clippy::multiple_crate_versions)]
 
-//---- ^^
-#[path = "minerva/config.rs"]
-mod config;
-#[path = "minerva/features.rs"]
-mod features;
-#[path = "minerva/headers.rs"]
-mod headers;
-#[path = "minerva/mbedtls.rs"]
-mod mbedtls;
-
-#[cfg(feature = "bindgen")]
-#[path = "minerva/bindgen.rs"]
-mod _impl_bindgen; // for `crate::mbedtls::BuildConfig`
-
-#[macro_use]
-extern crate lazy_static;
-//---- $$
-
 fn main() -> std::io::Result<()> {
     // If the prefix feature is not enabled then set the "CARGO_PKG_LINKS"
     // parameter to mbedcrypto to avoid any duplicate symbols from any other
@@ -174,7 +156,7 @@ mod common {
 
     #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
     pub fn generate_mbed_tls_bindings() -> Result<()> {
-        let cfg = crate::mbedtls::BuildConfig::new();
+        let cfg = mbedtls_bindings::mbedtls::BuildConfig::new();
         cfg.create_config_h();
         cfg.print_rerun_files();
         cfg.bindgen();
