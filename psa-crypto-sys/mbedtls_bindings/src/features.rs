@@ -2,6 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 use std::env;
+use lazy_static::lazy_static;
 
 pub struct Features {
     platform_components: HashMap<&'static str, HashSet<&'static str>>,
