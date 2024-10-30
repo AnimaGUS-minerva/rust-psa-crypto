@@ -22,8 +22,8 @@ libc = { version = "0.2.0" }
 #---- $$
 
 [build-dependencies]
-bindgen = { version = "0.69.4", optional = true }
 mbedtls_bindings = { path = "mbedtls_bindings", optional = true }
+bindgen = { version = "0.69.4", optional = true }
 cc = "1.0.59"
 cmake = "0.1.44"
 regex = "1.9.1"

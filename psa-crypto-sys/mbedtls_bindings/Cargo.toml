@@ -5,18 +5,10 @@ authors = ["ANIMA Minerva toolkit", "Fortanix, Inc."]
 edition = "2018"
 
 [dependencies]
+bindgen = { version = "0.69.4" }
+cc = "1.0.59"
 libz-sys = { version = "1.0.0", optional = true }
 
-##!!!!##[build-dependencies]
-#---- ^^ common to 'psa-crypto-sys/Cargo.toml'
-##!!!!##bindgen = { version = "0.69.4", optional = true }
-bindgen = { version = "0.69.4" }# !!!!
-cc = "1.0.59"
-cmake = "0.1.44"
-regex = "1.9.1"
-walkdir = "2.3.1"
-pkg-config = "0.3.29"
-#---- $$
 lazy_static = "1.4"
 syn = { version = "1.0.64", features = ["full", "visit"] }
 quote = "1.0.9"
