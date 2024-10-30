@@ -3,6 +3,12 @@ name = "mbedtls_bindings"
 version = "0.1.0"
 authors = ["ANIMA Minerva toolkit", "Fortanix, Inc."]
 edition = "2018"
+description = "Wrapper around the MBEDTLS API"
+readme = "README.md"
+keywords = ["crypto", "cryptography", "mbedtls"]
+categories = ["api-bindings", "external-ffi-bindings", "cryptography"]
+license = "Apache-2.0"
+repository = "https://github.com/parallaxsecond/rust-psa-crypto"
 
 [dependencies]
 bindgen = { version = "0.69.4" }
