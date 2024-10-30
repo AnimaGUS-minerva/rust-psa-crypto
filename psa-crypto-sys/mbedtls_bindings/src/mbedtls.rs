@@ -24,6 +24,12 @@ pub struct BuildConfig {
     pub cflags: Vec<String>,
 }
 
+impl Default for BuildConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BuildConfig {
     pub fn create_config_h(&self) {
         let mut defines = config::default_defines();
