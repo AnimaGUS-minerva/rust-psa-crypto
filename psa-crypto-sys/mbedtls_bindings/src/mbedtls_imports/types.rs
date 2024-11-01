@@ -24,10 +24,10 @@ pub type ptrdiff_t = isize;
 
 use cfg_if::cfg_if;
 
-#[cfg(feature = "mbedtls-std")]
+cfg_if! {
+    if #[cfg(feature = "mbedtls-std")] {
 pub use std::os::raw as raw_types;
-
-#[cfg(feature = "mbedtls-nostd")]
+    } else {
 pub mod raw_types {
     // From libstd/os/raw.rs
     super::cfg_if! {
@@ -75,6 +75,8 @@ pub mod raw_types {
         __variant1,
         #[doc(hidden)]
         __variant2,
+    }
+}
     }
 }
 
