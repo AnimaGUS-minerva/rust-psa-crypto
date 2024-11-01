@@ -29,6 +29,7 @@ mod psa_crypto_binding {
 }
 
 #[cfg(any(feature = "mbedtls-std", feature = "mbedtls-nostd"))]
+#[path = "../mbedtls_bindings/src/mbedtls_imports/mod.rs"]
 pub mod mbedtls;
 
 mod constants;
