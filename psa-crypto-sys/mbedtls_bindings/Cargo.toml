@@ -16,7 +16,7 @@ cc = "1.0.59"
 libz-sys = { version = "1.0.0", optional = true }
 
 lazy_static = "1.4"
-syn = { version = "1.0.64", features = ["full", "visit"] }
+syn = { version = "2", features = ["full", "visit"] }
 quote = "1.0.9"
 
 [features]
