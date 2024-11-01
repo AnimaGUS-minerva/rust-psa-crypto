@@ -6,7 +6,7 @@
  * option. This file may not be copied, modified, or distributed except
  * according to those terms. */
 
-#[cfg(feature = "std")]
+#[cfg(feature = "mbedtls-std")]
 extern crate core;
 
 pub mod types;
